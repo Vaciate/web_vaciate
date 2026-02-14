@@ -1,43 +1,42 @@
 import os
+import json
 from typing import List
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from supabase import create_client
 from groq import Groq
-import json
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware  # <--- Afegeix això
-# ... la resta d'imports (os, Groq, supabase, etc.)
 
+# 1. Carreguem les claus del fitxer .env primer de tot
+load_dotenv()
+
+# 2. Creem l'aplicació UNA SOLA VEGADA
 app = FastAPI(title="Vacíate API")
 
-# --- AFEGEIX AQUEST BLOC ARA ---
+# 3. Configurem el CORS (Súper important per al teu amic del Frontend)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permet que qualsevol web es connecti
+    allow_origins=["*"], 
     allow_credentials=True,
-    allow_methods=["*"],  # Permet tots els mètodes (GET, POST, etc.)
+    allow_methods=["*"],
     allow_headers=["*"],
 )
-# -------------------------------
 
-# Després continua el teu codi normal:
-# supabase = create_client(...)
-
-# 1. Carreguem claus
-load_dotenv()
-app = FastAPI(title="Vacíate API")
-
-# Connectem serveis
+# 4. Connectem amb els serveis externs
 supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 client_groq = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-# 2. Model de dades per rebre ingredients
+# 5. Model de dades (El contracte del JSON)
 class IngredientsRequest(BaseModel):
     ingredientes: List[str]
 
-# 3. La ruta que farà la feina
+# --- RUTES ---
+
+@app.get("/")
+def home():
+    return {"status": "online", "mensaje": "Servidor de Vacíate preparat!"}
+
 @app.post("/generar-receta")
 async def generar_receta(request: IngredientsRequest):
     if not request.ingredientes:
@@ -71,14 +70,9 @@ async def generar_receta(request: IngredientsRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/")
-def home():
-    return {"status": "online", "mensaje": "Servidor de Vacíate preparat!"}
-
 @app.get("/recetas")
 async def llistar_recetas():
     try:
-        # Demanem totes les receptes a Supabase ordenades per la més nova
         res = supabase.table("recetas").select("*").order("creado_el", desc=True).execute()
         return {"status": "success", "recetas": res.data}
     except Exception as e:
