@@ -1,4 +1,4 @@
-# 🍳 AI Kitchen Saver (Nombre Provisional)
+# 🍳 Vaciate
 
 ¡Bienvenido a la revolución de tu cocina! Esta aplicación ayuda a los usuarios a cocinar con lo que ya tienen, evitando el desperdicio de alimentos y ahorrando dinero mediante el uso de Inteligencia Artificial de última generación.
 
@@ -16,8 +16,8 @@
 * **Despliegue:** Vercel para el frontend, Render o Railway para el Backend.
 
 ## 👥 Autores
-* **[llucsega]** - 
-* **[josepsarriaper]** - 
+llucsega 
+josepsarriaper 
 
 ---
 ⭐ _Este es un proyecto de código abierto enfocado a la sostenibilidad alimentaria._
