@@ -73,3 +73,9 @@ ALTER TABLE recetas DISABLE ROW LEVEL SECURITY;
 ALTER TABLE perfiles DISABLE ROW LEVEL SECURITY;
 
 ------------------------------------------------------------------------------------------
+
+ALTER TABLE recetas 
+ADD COLUMN calories TEXT,
+ADD COLUMN tiempo TEXT;
+
+------------------------------------------------------------------------------------------
