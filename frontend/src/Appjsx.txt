@@ -1,0 +1,74 @@
+import { useState } from 'react'
+import axios from 'axios'
+import './App.css'
+
+function App() {
+  const [ingredients, setIngredients] = useState("")
+  const [receta, setReceta] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const generarReceta = async () => {
+    if (!ingredients) return alert("Escriu algun ingredient!")
+    
+    setLoading(true)
+    try {
+      // Connectem amb el teu Backend de Python
+      const res = await axios.post('http://localhost:8000/generar-receta', {
+        ingredientes: ingredients.split(",").map(i => i.trim())
+      })
+      
+      if (res.data.status === "error") {
+        alert(res.data.message) // Per si envies coses no comestibles
+      } else {
+        setReceta(res.data.receta)
+      }
+    } catch (error) {
+      alert("Error: Revisa que el teu main.py estigui encès!")
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="app-container">
+      <header>
+        <h1>Vacíate 🍳</h1>
+        <p>Cuina amb el que tinguis a mà</p>
+      </header>
+
+      <main>
+        <div className="search-box">
+          <input 
+            type="text" 
+            placeholder="Ex: ous, tomàquet, formatge..." 
+            value={ingredients}
+            onChange={(e) => setIngredients(e.target.value)}
+          />
+          <button onClick={generarReceta} disabled={loading}>
+            {loading ? "Cuinant..." : "Generar Recepta"}
+          </button>
+        </div>
+
+        {receta && (
+          <div className="recipe-card">
+            <h2>{receta.titulo}</h2>
+            <div className="info-row">
+              <span>⏱️ {receta.tiempo}</span>
+              <span>🔥 {receta.calories}</span>
+            </div>
+            <p className="joke"><em>{receta.humor}</em></p>
+            
+            <h3>Ingredients:</h3>
+            <ul>
+              {receta.ingredientes.map((ing, i) => <li key={i}>{ing}</li>)}
+            </ul>
+            
+            <h3>Instruccions:</h3>
+            <p>{receta.instrucciones}</p>
+          </div>
+        )}
+      </main>
+    </div>
+  )
+}
+
+export default App
